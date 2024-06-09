@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"net"
 	"os"
 	"path/filepath"
 	"sync"
@@ -142,7 +143,7 @@ func setPrivateKey(k crypto.PrivateKey) error {
 
 // checkNodeKeys checks if node.pem and user.root.pem exist, are not expiring and are signed by the correct CA. If not, these are re-generated.
 func checkNodeKeys() error {
-	if err := checkOrCreateKey("node.crt", "node.key", "node"); err != nil {
+	if err := checkOrCreateKey("node.crt", "node.key", "node", fleet.Self().AltNames()...); err != nil {
 		return err
 	}
 	if err := checkOrCreateKey("client.root.crt", "client.root.key", "root"); err != nil {
@@ -151,31 +152,83 @@ func checkNodeKeys() error {
 	return nil
 }
 
-func checkOrCreateKey(crtFile, keyFile, cn string) error {
+func checkOrCreateKey(crtFile, keyFile, cn string, altNames ...string) error {
 	p := basePath()
 
 	_, err := os.Stat(filepath.Join(p, crtFile))
 	_, err2 := os.Stat(filepath.Join(p, keyFile))
 	// either file is missing → create
 	if err != nil || err2 != nil {
-		return createKey(crtFile, keyFile, cn)
+		return createKey(crtFile, keyFile, cn, altNames...)
 	}
 
 	crt, err := readCertificateFile(filepath.Join(p, crtFile))
 	if err != nil {
-		return createKey(crtFile, keyFile, cn)
+		return createKey(crtFile, keyFile, cn, altNames...)
 	}
 
 	// check if crt.Issuer == caCrt.Subject. Only check commonname for now
 	if crt.Issuer.CommonName != caCrt.Subject.CommonName {
-		return createKey(crtFile, keyFile, cn)
+		return createKey(crtFile, keyFile, cn, altNames...)
 	}
 
 	// assume ok
 	return nil
 }
 
-func createKey(crtFile, keyFile, cn string) error {
+func createKey(crtFile, keyFile, cn string, altNames ...string) error {
+	newKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		return err
+	}
+	keyBin, err := x509.MarshalPKCS8PrivateKey(newKey)
+	if err != nil {
+		return fmt.Errorf("failed to marshal private key: %w", err)
+	}
+
 	// create key & CA-signed CA
+	now := time.Now()
+	crtTpl := &x509.Certificate{
+		BasicConstraintsValid: true,
+		IsCA:                  false,
+		Issuer:                caCrt.Subject,
+		Subject:               pkix.Name{CommonName: cn},
+		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageDataEncipherment | x509.KeyUsageKeyEncipherment,
+		MaxPathLen:            2,
+		NotBefore:             now,
+		NotAfter:              now.Add(365 * 24 * time.Hour),
+	}
+
+	// add altnames
+	for _, a := range altNames {
+		if ip := net.ParseIP(a); ip != nil {
+			crtTpl.IPAddresses = append(crtTpl.IPAddresses, ip)
+		} else {
+			crtTpl.DNSNames = append(crtTpl.DNSNames, a)
+		}
+	}
+
+	crtBin, err := x509.CreateCertificate(rand.Reader, crtTpl, caCrt, newKey.Public(), caKey)
+	if err != nil {
+		return err
+	}
+
+	keyPem := pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: keyBin})
+	crtPem := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: crtBin})
+
+	// write files
+	// certificates stored in ~/.config/froach and data in ~/.cache/froach
+	p := basePath()
+	os.MkdirAll(p, 0755)
+
+	// TODO we write ca.key for now, we should not in the future
+	err = os.WriteFile(filepath.Join(p, keyFile), keyPem, 0600)
+	if err != nil {
+		return fmt.Errorf("failed to write %s: %w", keyFile, err)
+	}
+	err = os.WriteFile(filepath.Join(p, crtFile), crtPem, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write %s: %w", crtFile, err)
+	}
 	return nil
 }

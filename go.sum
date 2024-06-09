@@ -1,5 +1,7 @@
 github.com/KarpelesLab/fleet v0.11.18 h1:ldQNo9DRTnNJ2Bs0yawaW7vSfjG6p2no7/R9VnBZs+Q=
 github.com/KarpelesLab/fleet v0.11.18/go.mod h1:ILr+zTD8Wt1MPpB5+cq5sf7CYHXucymVtd2V6DgIcJg=
+github.com/KarpelesLab/fleet v0.11.19 h1:+MqxxQdUgzsghbAFID3nEtbI6vLQ2Pwofqnh1Sp1y2c=
+github.com/KarpelesLab/fleet v0.11.19/go.mod h1:ILr+zTD8Wt1MPpB5+cq5sf7CYHXucymVtd2V6DgIcJg=
 github.com/KarpelesLab/goupd v0.4.4 h1:LFZ0I9CtCXU8mItEvewwbtnOVBxKTX1KaGAJOnGYR20=
 github.com/KarpelesLab/goupd v0.4.4/go.mod h1:tq6+XSbf6fNtLOdiG2ud23meV8JuP9mLXKOzoDZ1lno=
 github.com/KarpelesLab/jwt v0.1.10 h1:ubXuFPIX2coMyYKfoD2Gyk0Va7wNMQKmqbC5eKtqcrg=
