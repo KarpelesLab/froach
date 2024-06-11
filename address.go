@@ -1,25 +1,37 @@
 package froach
 
 import (
-	"context"
+	"net"
 
 	"github.com/KarpelesLab/fleet"
 )
 
-func init() {
-	fleet.SetRpcEndpoint("froach:address", func(any) (any, error) {
-		addr := fleet.Self().IP + ":36257"
-		return addr, nil
-	})
-}
-
 func getAddrs() []string {
-	res, _ := fleet.Self().AllRPC(context.Background(), "froach:address", nil)
+	peers := fleet.Self().GetPeers()
 	var final []string
 
-	for _, v := range res {
-		final = append(final, v.(string))
+	for _, v := range peers {
+		addr := addrIP(v.Addr())
+		if addr == nil {
+			continue
+		}
+		ipport := &net.TCPAddr{IP: addr, Port: 36257}
+		final = append(final, ipport.String())
 	}
 
 	return final
+}
+
+func addrIP(a net.Addr) net.IP {
+	switch b := a.(type) {
+	case *net.TCPAddr:
+		return b.IP
+	case *net.UDPAddr:
+		return b.IP
+	case *net.IPAddr:
+		return b.IP
+	default:
+		return nil
+	}
+	return nil
 }
