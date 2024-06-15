@@ -2,6 +2,7 @@ package froach
 
 import (
 	"bytes"
+	"compress/gzip"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
@@ -9,13 +10,39 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/KarpelesLab/fileutil"
 )
 
 type CockroachVersion struct {
 	Filename string
 	hash     []byte
+}
+
+// Exe returns the path to cockroach latest version
+func Exe() (string, error) {
+	v, err := GetLatestVersion()
+	if err != nil {
+		return "", err
+	}
+	p, err := os.UserCacheDir()
+	if err != nil {
+		p = "/tmp"
+	}
+	if _, err = os.Stat(filepath.Join(p, v.Dirname())); err == nil {
+		// directory already exists, return exe
+		return filepath.Join(p, v.Dirname(), "cockroach"), nil
+	}
+
+	err = v.ExtractTo(p)
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Join(p, v.Dirname(), "cockroach"), nil
 }
 
 // Dirname returns the directory name expected for the file. Typically cockroachdb
@@ -33,7 +60,7 @@ func (v *CockroachVersion) Dirname() string {
 	return v.Filename
 }
 
-// DownloadTo downloads the version of cockroachdb to a file and performs a check on the checksum
+// DownloadTo downloads the version of cockroachdb to a file while performing a checksum
 func (v *CockroachVersion) DownloadTo(fn string) error {
 	fp, err := os.Create(fn + "~")
 	if err != nil {
@@ -47,6 +74,9 @@ func (v *CockroachVersion) DownloadTo(fn string) error {
 		return err
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("HTTP status: %s", resp.Status)
+	}
 
 	h := sha256.New()
 	r := io.TeeReader(resp.Body, h)
@@ -67,6 +97,33 @@ func (v *CockroachVersion) DownloadTo(fn string) error {
 
 	// all good
 	os.Rename(fn+"~", fn)
+	return nil
+}
+
+// ExtractTo downloads the version of cockroachdb to a directory while performing a checksum
+//
+// Typically a directory named v.Dirname() will be created there
+func (v *CockroachVersion) ExtractTo(dirname string) error {
+	resp, err := http.Get("https://binaries.cockroachdb.com/" + v.Filename)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("HTTP status: %s", resp.Status)
+	}
+
+	h := sha256.New()
+	r := io.TeeReader(resp.Body, h)
+	g, err := gzip.NewReader(r)
+	if err != nil {
+		return err
+	}
+	err = fileutil.TarExtract(g, dirname)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
