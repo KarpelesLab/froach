@@ -1,5 +1,7 @@
 github.com/KarpelesLab/fileutil v0.1.0 h1:yFKXHrHcZAddNpD0ksHWnI3m9VaPm/l/sbwu+tSsFJY=
 github.com/KarpelesLab/fileutil v0.1.0/go.mod h1:aPemqn2zMlqUFnc0Gb7/nE+XjRz/NDc8x9fetEkQfWs=
+github.com/KarpelesLab/fileutil v0.1.1 h1:DUI48LPza7zgXUycK3u4+VPv4zn7EBHcoMx3x7okiUs=
+github.com/KarpelesLab/fileutil v0.1.1/go.mod h1:aPemqn2zMlqUFnc0Gb7/nE+XjRz/NDc8x9fetEkQfWs=
 github.com/KarpelesLab/fleet v0.11.18 h1:ldQNo9DRTnNJ2Bs0yawaW7vSfjG6p2no7/R9VnBZs+Q=
 github.com/KarpelesLab/fleet v0.11.18/go.mod h1:ILr+zTD8Wt1MPpB5+cq5sf7CYHXucymVtd2V6DgIcJg=
 github.com/KarpelesLab/fleet v0.11.19 h1:+MqxxQdUgzsghbAFID3nEtbI6vLQ2Pwofqnh1Sp1y2c=

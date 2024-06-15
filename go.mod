@@ -3,7 +3,7 @@ module github.com/KarpelesLab/froach
 go 1.22.2
 
 require (
-	github.com/KarpelesLab/fileutil v0.1.0
+	github.com/KarpelesLab/fileutil v0.1.1
 	github.com/KarpelesLab/fleet v0.11.20
 )
 
