@@ -28,11 +28,7 @@ func Exe() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	p, err := os.UserCacheDir()
-	if err != nil {
-		p = "/tmp"
-	}
-	p = filepath.Join(p, "froach")
+	p := cachePath()
 
 	if _, err = os.Stat(filepath.Join(p, v.Dirname())); err == nil {
 		// directory already exists, return exe
