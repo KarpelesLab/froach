@@ -119,7 +119,18 @@ func (v *CockroachVersion) ExtractTo(dirname string) error {
 	}
 	err = fileutil.TarExtract(g, dirname)
 	if err != nil {
+		// remove anything we may have created
+		os.RemoveAll(filepath.Join(dirname, v.Dirname()))
 		return err
+	}
+
+	if v.hash != nil {
+		sum := h.Sum(nil)
+		if !bytes.Equal(sum, v.hash) {
+			// remove what we just extracted
+			os.RemoveAll(filepath.Join(dirname, v.Dirname()))
+			return errors.New("cockroachdb download failed: bad hash")
+		}
 	}
 
 	return nil
