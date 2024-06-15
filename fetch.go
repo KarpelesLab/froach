@@ -32,7 +32,7 @@ func Exe() (string, error) {
 	if err != nil {
 		p = "/tmp"
 	}
-	p = filepath.Join(p, "cockroachdb")
+	p = filepath.Join(p, "froach")
 
 	if _, err = os.Stat(filepath.Join(p, v.Dirname())); err == nil {
 		// directory already exists, return exe
