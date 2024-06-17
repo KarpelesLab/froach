@@ -8,13 +8,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 
 	"github.com/KarpelesLab/fileutil"
+	"github.com/KarpelesLab/webutil"
 )
 
 type CockroachVersion struct {
@@ -67,19 +67,15 @@ func (v *CockroachVersion) DownloadTo(fn string) error {
 	defer os.Remove(fn + "~")
 	defer fp.Close()
 
-	resp, err := http.Get("https://binaries.cockroachdb.com/" + v.Filename)
+	r, err := webutil.Get("https://binaries.cockroachdb.com/" + v.Filename)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("HTTP status: %s", resp.Status)
-	}
+	defer r.Close()
 
 	h := sha256.New()
-	r := io.TeeReader(resp.Body, h)
 
-	_, err = io.Copy(fp, r)
+	_, err = io.Copy(fp, io.TeeReader(r, h))
 	if err != nil {
 		return err
 	}
@@ -102,22 +98,18 @@ func (v *CockroachVersion) DownloadTo(fn string) error {
 //
 // Typically a directory named v.Dirname() will be created there
 func (v *CockroachVersion) ExtractTo(dirname string) error {
-	resp, err := http.Get("https://binaries.cockroachdb.com/" + v.Filename)
+	r, err := webutil.Get("https://binaries.cockroachdb.com/" + v.Filename)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("HTTP status: %s", resp.Status)
-	}
+	defer r.Close()
 
 	h := sha256.New()
-	r := io.TeeReader(resp.Body, h)
-	g, err := gzip.NewReader(r)
+	r, err = gzip.NewReader(io.TeeReader(r, h))
 	if err != nil {
 		return err
 	}
-	err = fileutil.TarExtract(g, dirname)
+	err = fileutil.TarExtract(r, dirname)
 	if err != nil {
 		// remove anything we may have created
 		os.RemoveAll(filepath.Join(dirname, v.Dirname()))
@@ -136,14 +128,17 @@ func (v *CockroachVersion) ExtractTo(dirname string) error {
 	return nil
 }
 
+// GetLatestVersion gathers information on the latest cockroachdb version from cockroach servers
+// and returns a CockroachVersion.
 func GetLatestVersion() (*CockroachVersion, error) {
 	return GetVersion("latest")
 }
 
+// GetVersion gathers information on the specified cockroachdb version and returns a CockroachVersion.
 func GetVersion(vers string) (*CockroachVersion, error) {
 	// https://binaries.cockroachdb.com/cockroach-$vers.linux-amd64.tgz.sha256sum
 	u := fmt.Sprintf("https://binaries.cockroachdb.com/cockroach-%s.%s-%s.tgz.sha256sum", vers, runtime.GOOS, runtime.GOARCH)
-	nfo, err := simpleGet(u)
+	nfo, err := readStream(webutil.Get(u))
 	if err != nil {
 		return nil, err
 	}
@@ -166,15 +161,9 @@ func GetVersion(vers string) (*CockroachVersion, error) {
 	return res, nil
 }
 
-func simpleGet(u string) ([]byte, error) {
-	resp, err := http.Get(u)
+func readStream(r io.Reader, err error) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("HTTP error: %s", resp.Status)
-	}
-
-	return io.ReadAll(resp.Body)
+	return io.ReadAll(r)
 }
