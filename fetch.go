@@ -24,6 +24,13 @@ type CockroachVersion struct {
 
 // Exe returns the path to cockroach latest version
 func Exe() (string, error) {
+	if runtime.GOOS == "linux" {
+		// if linux, check if azusa version is available, and return it if it is
+		if _, err := os.Stat("/pkg/main/dev-db.cockroach-bin.core/bin/cockroach"); err == nil {
+			return "/pkg/main/dev-db.cockroach-bin.core/bin/cockroach", nil
+		}
+	}
+
 	v, err := GetLatestVersion()
 	if err != nil {
 		return "", err
