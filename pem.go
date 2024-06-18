@@ -4,45 +4,47 @@ import (
 	"crypto"
 	"crypto/x509"
 	"encoding/pem"
-	"errors"
 	"fmt"
 	"os"
 )
 
+// readPrivateKeyFile returns a private key from a given PEM file
 func readPrivateKeyFile(fn string) (crypto.PrivateKey, error) {
-	b, err := readPemFile(fn)
+	b, err := readPemFile(fn, "PRIVATE KEY")
 	if err != nil {
 		return nil, err
-	}
-	if b.Type != "PRIVATE KEY" {
-		return nil, fmt.Errorf("invalid PEM data type: %s", b.Type)
 	}
 
 	return x509.ParsePKCS8PrivateKey(b.Bytes)
 }
 
+// readCertificateFile returns a certificate from a given PEM file
 func readCertificateFile(fn string) (*x509.Certificate, error) {
-	b, err := readPemFile(fn)
+	b, err := readPemFile(fn, "CERTIFICATE")
 	if err != nil {
 		return nil, err
-	}
-	if b.Type != "CERTIFICATE" {
-		return nil, fmt.Errorf("invalid PEM data type: %s", b.Type)
 	}
 
 	return x509.ParseCertificate(b.Bytes)
 }
 
-func readPemFile(fn string) (*pem.Block, error) {
+// readPemFile reads a PEM file and returns the first block found of the given type
+func readPemFile(fn, typ string) (*pem.Block, error) {
 	dat, err := os.ReadFile(fn)
 	if err != nil {
 		return nil, err
 	}
 
-	b, _ := pem.Decode(dat)
-	if b == nil {
-		return nil, errors.New("malformed PEM file")
+	for {
+		var b *pem.Block
+		b, dat = pem.Decode(dat)
+		if b == nil {
+			break
+		}
+		if b.Type == typ {
+			return b, nil
+		}
 	}
 
-	return b, nil
+	return nil, fmt.Errorf("failed to parse PEM file %s: %s not found", typ, fn)
 }
