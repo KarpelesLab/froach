@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -105,12 +106,12 @@ func makeCmdline(peers []string) []string {
 
 	res := []string{
 		"start",
-		"--store=/www/phplatform/stable/data/db",
+		"--store=" + filepath.Join(cachePath(), "db"),
 		"--listen-addr=:36257",
 		"--sql-addr=localhost:26257",
 		"--accept-sql-without-tls",
 		"--cache=.25",
-		"--certs-dir=/www/phplatform/stable/data/db-cert", // cert dir
+		"--certs-dir=" + basePath(), // cert dir
 		"--cluster-name",
 		"phplatform", // cluster name
 		"--http-addr",
