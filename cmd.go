@@ -67,26 +67,6 @@ func check() error {
 	return nil
 }
 
-// if running locally (dev mode), we can run cockroach using:
-// /pkg/main/dev-db.cockroach-bin.core/bin/cockroach start-single-node --insecure --store=type=mem,size=50% --listen-addr=localhost:36257 --sql-addr=localhost:26257 --accept-sql-without-tls --http-addr localhost:28080
-//
-// If running as a cluster, we first need to generate or fetch certificates
-// Then we need the following options
-// --store=type=ssd,/www/phplatform/stable/data/db
-// --listen-addr=:36257
-// --advertise-addr <ip>
-// --sql-addr=localhost:26257
-// --accept-sql-without-tls
-// --attrs ?
-// --cache .25
-// --certs-dir /path/to/certs (/home/magicaltux/.cockroach-certs)
-// --cluster-name <name>
-// --http-addr localhost:28080
-// --join host:port,host:port
-// --locality=cloud=gce,region=us-west1,zone=us-west-1b
-// --socket-dir ?
-// --unencrypted-localhost-http
-
 func makeCmdline(peers []string) []string {
 	// check for goupd flags
 	if goupd.MODE == "DEV" {
@@ -101,8 +81,6 @@ func makeCmdline(peers []string) []string {
 			"localhost:28081",
 		}
 	}
-
-	// /pkg/main/dev-db.cockroach-bin.core/bin/cockroach start --store=type=ssd,/www/phplatform/stable/data/db --listen-addr=:36257 --advertise-addr 172.31.14.173 --sql-addr=localhost:26257 --accept-sql-without-tls --cache .25 --certs-dir /www/phplatform/stable/data/db-cert --cluster-name phplatform --http-addr localhost:28080 --join 172.31.9.176:36257 --join 172.31.41.42:36257 --join 172.31.18.81:36257 --locality=cloud=aws,region=ap-northeast-1,zone=ap-northeast-1c --unencrypted-localhost-http
 
 	res := []string{
 		"start",
