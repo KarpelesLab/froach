@@ -14,10 +14,11 @@ import (
 	"github.com/KarpelesLab/runutil"
 )
 
-func cockroachMonitor() {
+func Monitor() {
 	time.Sleep(5 * time.Second)
 	cockroachCheck()
 
+	// initialize ticker only after running once since first run can take longer (cockroach download, etc)
 	t := time.NewTicker(time.Minute)
 
 	for _ = range t.C {
@@ -45,6 +46,11 @@ func check() error {
 		return nil
 	}
 
+	exe, err := Exe()
+	if err != nil {
+		return err
+	}
+
 	// let's get a list of peers
 	peers := getAddrs()
 
@@ -52,14 +58,14 @@ func check() error {
 	cmdline := makeCmdline(peers)
 
 	// prepare command
-	c := exec.Command("/pkg/main/dev-db.cockroach-bin.core/bin/cockroach", cmdline...)
+	c := exec.Command(exe, cmdline...)
 	c.Stdin = os.Stdin
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
 
 	slog.Debug(fmt.Sprintf("[pgdb] about to launch: %s", c), "event", "mercury:pgdb:run")
 
-	err := c.Start()
+	err = c.Start()
 	if err != nil {
 		return err
 	}
