@@ -1,3 +1,5 @@
+github.com/KarpelesLab/cloudinfo v0.1.6 h1:WsejQSkiD7qvDqzhGt0FuyNczry4PDeg+9fERfrJHZE=
+github.com/KarpelesLab/cloudinfo v0.1.6/go.mod h1:JUe7GRz++49G6wOQzWbiMVFnvmJh/Y7iA4Oq8JD/Wis=
 github.com/KarpelesLab/fileutil v0.1.0 h1:yFKXHrHcZAddNpD0ksHWnI3m9VaPm/l/sbwu+tSsFJY=
 github.com/KarpelesLab/fileutil v0.1.0/go.mod h1:aPemqn2zMlqUFnc0Gb7/nE+XjRz/NDc8x9fetEkQfWs=
 github.com/KarpelesLab/fileutil v0.1.1 h1:DUI48LPza7zgXUycK3u4+VPv4zn7EBHcoMx3x7okiUs=
@@ -16,6 +18,8 @@ github.com/KarpelesLab/jwt v0.1.11 h1:oEIHZz78qJhs3zzxsjubOTvrE/RXy44oRa3Ul/TGTx
 github.com/KarpelesLab/jwt v0.1.11/go.mod h1:rv2G7Sx+iXO9KH6qCL0SIRordO0FTxLTUwh8GUbtmbY=
 github.com/KarpelesLab/rchan v1.0.1 h1:uIkAAp/50NjY+j0LTkWmyk2h+RzIu525Y4Dg/vMxV2k=
 github.com/KarpelesLab/rchan v1.0.1/go.mod h1:Osy4g3kPFTIwBn+N6TVji4goTOdzEJYIlaE7m8nv2sw=
+github.com/KarpelesLab/runutil v0.2.4 h1:jtWAlr30Bjd0hpIKpia03pyA4gZyUCVGE+eUQ5QZeMQ=
+github.com/KarpelesLab/runutil v0.2.4/go.mod h1:Pn6ctZ1Ks10H6JpH+IXLxFi3B+s3bJ2aMtjOsYEIEeA=
 github.com/KarpelesLab/webutil v0.2.1 h1:5mB+mPBj3iRasv9zY9rDAh00yvKQWJxDOjyUZTjfmlY=
 github.com/KarpelesLab/webutil v0.2.1/go.mod h1:AKTsmoimqwSdJHtZzBnvxcjQv3lgyw/GVJFVyXaDilU=
 github.com/golang/protobuf v1.5.4 h1:i7eJL8qZTpSEXOPTxNKhASYpMn+8e5Q6AdndVa1dWek=

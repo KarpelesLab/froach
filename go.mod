@@ -3,13 +3,15 @@ module github.com/KarpelesLab/froach
 go 1.22.2
 
 require (
+	github.com/KarpelesLab/cloudinfo v0.1.6
 	github.com/KarpelesLab/fileutil v0.1.1
 	github.com/KarpelesLab/fleet v0.11.20
+	github.com/KarpelesLab/goupd v0.4.4
+	github.com/KarpelesLab/runutil v0.2.4
 	github.com/KarpelesLab/webutil v0.2.1
 )
 
 require (
-	github.com/KarpelesLab/goupd v0.4.4 // indirect
 	github.com/KarpelesLab/jwt v0.1.11 // indirect
 	github.com/KarpelesLab/rchan v1.0.1 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
