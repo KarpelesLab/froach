@@ -10,8 +10,8 @@ import (
 	"github.com/KarpelesLab/runutil"
 )
 
-// Monitor will check if cockroachdb is launched every 1 min and launch it if needed
-func Monitor() {
+// monitor will check if cockroachdb is launched every 1 min and launch it if needed
+func monitor() {
 	time.Sleep(5 * time.Second)
 	cockroachCheck()
 

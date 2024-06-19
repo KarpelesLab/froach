@@ -32,4 +32,6 @@ func start() {
 			}
 		}
 	}
+
+	go monitor()
 }
