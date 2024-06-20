@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/KarpelesLab/fleet"
 	"github.com/KarpelesLab/runutil"
 )
 
@@ -51,8 +52,10 @@ func check() error {
 	// let's get a list of peers
 	peers := getAddrs()
 
+	_, domain := fleet.Self().Name()
+
 	// make cmdline
-	cmdline := makeCmdline(peers)
+	cmdline := makeCmdline(domain, peers)
 
 	// prepare command
 	c := exec.Command(exe, cmdline...)

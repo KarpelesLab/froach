@@ -8,7 +8,7 @@ import (
 	"github.com/KarpelesLab/goupd"
 )
 
-func makeCmdline(peers []string) []string {
+func makeCmdline(clusterName string, peers []string) []string {
 	// check for goupd flags
 	if goupd.MODE == "DEV" {
 		return []string{
@@ -32,7 +32,7 @@ func makeCmdline(peers []string) []string {
 		"--cache=.25",
 		"--certs-dir=" + basePath(), // cert dir
 		"--cluster-name",
-		"phplatform", // cluster name
+		clusterName,
 		"--http-addr",
 		"localhost:28080",
 		//"--locality=cloud=gce,region=us-west1,zone=us-west-1b",
