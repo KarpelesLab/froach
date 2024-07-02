@@ -63,7 +63,7 @@ func check() error {
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
 
-	slog.Debug(fmt.Sprintf("[pgdb] about to launch: %s", c), "event", "mercury:pgdb:run")
+	slog.Debug(fmt.Sprintf("[pgdb] about to launch: %s", c), "event", "froach:run")
 
 	err = c.Start()
 	if err != nil {
