@@ -45,12 +45,8 @@ func makeCmdline(clusterName string, peers []string) []string {
 	}
 	res = append(res, cockroachLocalityArgs(info)...)
 
-	var join []string
-	for _, peer := range peers {
-		join = append(join, peer+":36257")
-	}
-	if len(join) > 0 {
-		res = append(res, "--join="+strings.Join(join, ","))
+	if len(peers) > 0 {
+		res = append(res, "--join="+strings.Join(peers, ","))
 	}
 
 	return res
