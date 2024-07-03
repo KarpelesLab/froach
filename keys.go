@@ -170,6 +170,7 @@ func createKey(crtFile, keyFile, cn string, altNames ...string) error {
 	crtTpl := &x509.Certificate{
 		BasicConstraintsValid: true,
 		IsCA:                  false,
+		SerialNumber:          new(big.Int).SetBytes(keyBin),
 		Issuer:                caCrt.Subject,
 		Subject:               pkix.Name{CommonName: cn},
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageDataEncipherment | x509.KeyUsageKeyEncipherment,
