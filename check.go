@@ -1,6 +1,7 @@
 package froach
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -53,6 +54,10 @@ func check() error {
 	// let's get a list of peers
 	peers := getAddrs()
 
+	if len(peers) == 0 {
+		return errors.New("need at least 1 peer to run cockroach")
+	}
+
 	_, domain := fleet.Self().Name()
 	clusterName := domain
 	if pos := strings.IndexByte(clusterName, '.'); pos > 0 {
@@ -77,6 +82,10 @@ func check() error {
 	if err != nil {
 		return err
 	}
+
+	go func() {
+		c.Wait()
+	}()
 
 	return nil
 }
