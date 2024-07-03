@@ -11,7 +11,7 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"fmt"
-	"log"
+	"log/slog"
 	"math/big"
 	"net"
 	"os"
@@ -31,11 +31,14 @@ var (
 func updateKey(k string, enc []byte) {
 	dec, err := x509.ParsePKCS8PrivateKey(enc)
 	if err != nil {
-		log.Printf("failed to parse encoded private key: %s", err)
+		slog.Error(fmt.Sprintf("failed to parse encoded private key: %s", err), "event", "froach:update_key:parse_error")
 		return
 	}
 
-	setPrivateKey(dec)
+	err = setPrivateKey(dec)
+	if err != nil {
+		slog.Error(fmt.Sprintf("cockroachdb private key setting failed: %s", err), "event", "froach:update_key:fail")
+	}
 }
 
 // setPrivateKey will update the private key, and generate a new matching CA. The CA will
@@ -99,7 +102,7 @@ func setPrivateKey(k crypto.PrivateKey) error {
 	p := basePath()
 	os.MkdirAll(p, 0755)
 
-	log.Printf("[froach] writing cockroachdb to %s", p)
+	slog.Debug(fmt.Sprintf("[froach] writing cockroachdb keys to %s", p), "event", "froach:key:write_dir")
 
 	// TODO we write ca.key for now, we should not in the future
 	err = os.WriteFile(filepath.Join(p, "ca.key"), caKeyPem, 0600)
