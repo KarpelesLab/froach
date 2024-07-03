@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/KarpelesLab/fleet"
@@ -53,9 +54,16 @@ func check() error {
 	peers := getAddrs()
 
 	_, domain := fleet.Self().Name()
+	clusterName := domain
+	if pos := strings.IndexByte(clusterName, '.'); pos > 0 {
+		clusterName = clusterName[:pos]
+	} else if pos == 0 {
+		// domain shouldn't start with a dot
+		clusterName = "database"
+	}
 
 	// make cmdline
-	cmdline := makeCmdline(domain, peers)
+	cmdline := makeCmdline(clusterName, peers)
 
 	// prepare command
 	c := exec.Command(exe, cmdline...)
