@@ -17,11 +17,11 @@ func init() {
 }
 
 func start() {
-	fleet.Self().DbWatch("froach:ca:key", updateKey)
+	fleet.Self().DbWatch("froach:ca:key!", updateKey)
 	fleet.Self().WaitReady()    // this will wait for fleet to start
 	time.Sleep(5 * time.Second) // give a bit of time just in case
 
-	_, err := fleet.Self().DbGet("froach:ca:key")
+	_, err := fleet.Self().DbGet("froach:ca:key!")
 	if errors.Is(err, fs.ErrNotExist) {
 		// no key? generate one
 		newKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
@@ -29,7 +29,7 @@ func start() {
 			kData, err := x509.MarshalPKCS8PrivateKey(newKey)
 			if err == nil {
 				// let's try to use this key
-				fleet.Self().DbSet("froach:ca:key", kData)
+				fleet.Self().DbSet("froach:ca:key!", kData)
 				setPrivateKey(newKey)
 			}
 		}
