@@ -5,6 +5,8 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/x509"
+	"errors"
+	"io/fs"
 	"time"
 
 	"github.com/KarpelesLab/fleet"
@@ -20,7 +22,7 @@ func start() {
 	time.Sleep(5 * time.Second) // give a bit of time just in case
 
 	_, err := fleet.Self().DbGet("froach:ca:key")
-	if err == nil {
+	if errors.Is(err, fs.ErrNotExist) {
 		// no key? generate one
 		newKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 		if err == nil {
